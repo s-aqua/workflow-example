@@ -1,0 +1,37 @@
+trigger:
+  on:
+    push:
+
+variables:
+  # dev configuration
+  devBranch: devBranch
+  # test configuration
+  tstBranch: testBranch
+
+
+stages:
+- template: /templates/template-workflow.yml@self
+  parameters:
+    stage: prod
+    environment: production
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    branch: $(devBranch)
+    password: ${{ secrets.password }}
+    with:
+      variable-path: ./.github/variables/prod.env*
+
+- template: /pipelines/templates/release-template.yml@self
+  parameters:
+    stage: development
+    environment: development
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/development'))
+    branch: $(devSvcConnection)
+    password: ${{ secrets.password }}
+
+- template: /pipelines/templates/release-template.yml@self
+  parameters:
+    stage: test
+    environment: test
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/testing'))
+    branch: $(devSvcConnection)
+    password: ${{ secrets.password }}
