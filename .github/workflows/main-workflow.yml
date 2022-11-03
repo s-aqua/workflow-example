@@ -1,6 +1,5 @@
 trigger:
-  on:
-    - push
+  on: push
 
 variables:
   # dev configuration
